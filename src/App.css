@@ -155,3 +155,44 @@
   color: #b91c1c;
   font-weight: bold;
 }
+
+
+/* Aperçu des données ECG */
+
+.ecg-preview {
+  margin-top: 25px;
+  padding: 25px;
+  background-color: white;
+  border-radius: 12px;
+}
+
+.ecg-preview h3 {
+  color: #176b87;
+}
+
+.ecg-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.ecg-preview th,
+.ecg-preview td {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.ecg-preview th {
+  background-color: #e8f4f8;
+  color: #176b87;
+}
+
+.ecg-preview tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.ecg-preview p {
+  color: #64748b;
+  font-size: 14px;
+}
