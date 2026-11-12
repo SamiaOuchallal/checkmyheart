@@ -213,3 +213,41 @@
   color: #176b87;
   margin-bottom: 20px;
 }
+
+
+.backend-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.backend-status__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #94a3b8;
+}
+
+.backend-status--online {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+
+.backend-status--online .backend-status__dot {
+  background-color: #10b981;
+}
+
+.backend-status--offline {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.backend-status--offline .backend-status__dot {
+  background-color: #ef4444;
+}

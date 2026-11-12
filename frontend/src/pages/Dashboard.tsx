@@ -1,8 +1,11 @@
+import BackendStatus from '../components/BackendStatus'
 
 function Dashboard() {
   return (
     <section className="dashboard">
       <h1>Tableau de bord</h1>
+
+      <BackendStatus />
 
       <p>
         Bienvenue sur CheckMyHeart,
@@ -16,6 +19,7 @@ function Dashboard() {
           Importez un électrocardiogramme
           pour visualiser son signal.
         </p>
+
       </div>
     </section>
   )
