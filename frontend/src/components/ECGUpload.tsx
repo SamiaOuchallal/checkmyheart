@@ -6,6 +6,10 @@ import type { ECGPoint } from '../types/ecg'
 import { parseECG } from '../utils/parseECG'
 import ECGChart from './ECGChart'
 
+import { analyzeECG } from '../services/api'
+import type { ECGAnalysisResult } from '../services/api'
+import ECGAnalysisResults from './ECGAnalysisResults'
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 function ECGUpload() {
@@ -14,6 +18,12 @@ function ECGUpload() {
 
   const [ecgData, setEcgData] =
     useState<ECGPoint[]>([])
+
+  const [analysisResult, setAnalysisResult] =
+  useState<ECGAnalysisResult | null>(null)
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
 
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -24,6 +34,9 @@ function ECGUpload() {
     event: ChangeEvent<HTMLInputElement>
   ) {
     const file = event.target.files?.[0]
+
+    setAnalysisResult(null)
+    setAnalysisError(null)
 
     setSelectedFile(null)
     setEcgData([])
@@ -71,10 +84,36 @@ function ECGUpload() {
     setEcgData([])
     setError('')
 
+    setAnalysisResult(null)
+    setAnalysisError(null)
+
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
   }
+
+
+async function handleAnalyze() {
+  if (ecgData.length < 2 || isAnalyzing) {
+    return
+  }
+
+  setIsAnalyzing(true)
+  setAnalysisError(null)
+  setAnalysisResult(null)
+
+  try {
+    const result = await analyzeECG(ecgData)
+    setAnalysisResult(result)
+  } catch {
+    setAnalysisError(
+      "L'analyse a échoué. Vérifie que le backend est démarré."
+    )
+  } finally {
+    setIsAnalyzing(false)
+  }
+}
+
 
   return (
     <div className="ecg-upload">
@@ -163,6 +202,28 @@ function ECGUpload() {
         </div>
       )}
       {ecgData.length > 0 && (<ECGChart data={ecgData} />)}
+
+      {ecgData.length >= 2 && (
+  <div className="ecg-analysis-actions">
+    <button
+      type="button"
+      onClick={handleAnalyze}
+      disabled={isAnalyzing}
+    >
+      {isAnalyzing ? 'Analyse en cours...' : 'Analyser le signal'}
+    </button>
+  </div>
+)}
+
+{analysisError && (
+  <p role="alert" className="ecg-analysis-error">
+    {analysisError}
+  </p>
+)}
+
+{analysisResult && (
+  <ECGAnalysisResults result={analysisResult} />
+)}
     </div>
   )
 }
