@@ -4,6 +4,7 @@ import type { ChangeEvent } from 'react'
 
 import type { ECGPoint } from '../types/ecg'
 import { parseECG } from '../utils/parseECG'
+import ECGChart from './ECGChart'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
@@ -161,6 +162,7 @@ function ECGUpload() {
           </p>
         </div>
       )}
+      {ecgData.length > 0 && (<ECGChart data={ecgData} />)}
     </div>
   )
 }
