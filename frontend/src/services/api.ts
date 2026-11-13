@@ -46,3 +46,39 @@ export async function analyzeECG(
 
   return result
 }
+
+
+export interface ECGFilterResult {
+  point_count: number
+  filtered_points: ECGPoint[]
+}
+
+export async function filterECG(
+  points: ECGPoint[]
+): Promise<ECGFilterResult> {
+  const response = await fetch(`${API_BASE_URL}/api/ecg/filter`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ points }),
+  })
+
+  if (!response.ok) {
+    let message = `Erreur de filtrage (${response.status})`
+
+    try {
+      const errorData = await response.json()
+
+      if (typeof errorData.detail === 'string') {
+        message = errorData.detail
+      }
+    } catch {
+      // Conserver le message générique
+    }
+
+    throw new Error(message)
+  }
+
+  return (await response.json()) as ECGFilterResult
+}

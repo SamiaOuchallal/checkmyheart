@@ -38,7 +38,7 @@ function ECGAnalysisResults({ result }: ECGAnalysisResultsProps) {
       </div>
 
       <p className="ecg-results__notice">
-        Résultats expérimentaux à usage pédagogique.
+        Résultats expérimentaux.
         Ils ne constituent pas un diagnostic médical.
       </p>
     </section>

@@ -10,6 +10,8 @@ import { analyzeECG } from '../services/api'
 import type { ECGAnalysisResult } from '../services/api'
 import ECGAnalysisResults from './ECGAnalysisResults'
 
+import {filterECG} from '../services/api'
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 function ECGUpload() {
@@ -30,6 +32,10 @@ function ECGUpload() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [filteredData, setFilteredData] = useState<ECGPoint[]>([])
+  const [isFiltering, setIsFiltering] = useState(false)
+  const [filterError, setFilterError] = useState<string | null>(null)
+
   async function handleFileChange(
     event: ChangeEvent<HTMLInputElement>
   ) {
@@ -37,6 +43,8 @@ function ECGUpload() {
 
     setAnalysisResult(null)
     setAnalysisError(null)
+    setFilteredData([])
+    setFilterError(null)
 
     setSelectedFile(null)
     setEcgData([])
@@ -86,6 +94,8 @@ function ECGUpload() {
 
     setAnalysisResult(null)
     setAnalysisError(null)
+    setFilteredData([])
+    setFilterError(null)
 
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -111,6 +121,31 @@ async function handleAnalyze() {
     )
   } finally {
     setIsAnalyzing(false)
+  }
+}
+
+
+
+async function handleFilter() {
+  if (ecgData.length < 20 || isFiltering) {
+    return
+  }
+
+  setIsFiltering(true)
+  setFilterError(null)
+  setFilteredData([])
+
+  try {
+    const result = await filterECG(ecgData)
+    setFilteredData(result.filtered_points)
+  } catch (error) {
+    setFilterError(
+      error instanceof Error
+        ? error.message
+        : "Une erreur est survenue pendant le filtrage."
+    )
+  } finally {
+    setIsFiltering(false)
   }
 }
 
@@ -201,7 +236,27 @@ async function handleAnalyze() {
           </p>
         </div>
       )}
-      {ecgData.length > 0 && (<ECGChart data={ecgData} />)}
+      {ecgData.length > 0 && (<ECGChart data={ecgData} filteredData={filteredData} />)}
+
+
+{ecgData.length >= 20 && (
+  <div className="ecg-analysis-actions">
+    <button
+      type="button"
+      onClick={handleFilter}
+      disabled={isFiltering}
+    >
+      {isFiltering ? 'Filtrage en cours...' : 'Filtrer le signal'}
+    </button>
+  </div>
+)}
+
+{filterError && (
+  <p role="alert" className="ecg-analysis-error">
+    {filterError}
+  </p>
+)}
+
 
       {ecgData.length >= 2 && (
   <div className="ecg-analysis-actions">

@@ -1,33 +1,54 @@
 
 import Plot from 'react-plotly.js'
 import type { ECGPoint } from '../types/ecg'
+import type * as Plotly from 'plotly.js'
 
 interface ECGChartProps {
   data: ECGPoint[]
+  filteredData?: ECGPoint[]
 }
 
-function ECGChart({ data }: ECGChartProps) {
+function ECGChart({ data, filteredData }: ECGChartProps) {
   const timeValues = data.map(point => point.time)
   const ecgValues = data.map(point => point.ecg)
 
+
+  const traces: Plotly.Data[] = [
+    {
+      x: data.map(point => point.time),
+      y: data.map(point => point.ecg),
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Signal brut',
+      line: {
+        color: '#94a3b8',
+        width: 1.5,
+      },
+    },
+  ]
+
+  if (filteredData && filteredData.length > 0) {
+    traces.push({
+      x: filteredData.map(point => point.time),
+      y: filteredData.map(point => point.ecg),
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Signal filtré',
+      line: {
+        color: '#176b87',
+        width: 2,
+      },
+    })
+  }
+
+
+  
   return (
     <div className="ecg-chart">
       <h3>Visualisation du signal ECG</h3>
 
       <Plot
-        data={[
-          {
-            x: timeValues,
-            y: ecgValues,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Signal ECG',
-            line: {
-              color: '#176b87',
-              width: 2
-            }
-          }
-        ]}
+        data={traces}
         layout={{
           title: {
             text: 'Signal ECG importé'

@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from typing import Annotated
 import math
 from fastapi import HTTPException
+from ecg_processing import filter_ecg
 
 app = FastAPI(
     title="CheckMyHeart API",
@@ -80,3 +81,31 @@ def analyze_ecg(request: ECGRequest):
             "max_amplitude": max(amplitudes),
             "mean_amplitude": sum(amplitudes) / len(amplitudes)
         }
+
+@app.post("/api/ecg/filter")
+def filter_ecg_route(request: ECGRequest):
+    points = request.points
+    times = [point.time for point in points]
+    amplitudes = [point.ecg for point in points]
+
+    try: 
+        filtered_amplitudes = filter_ecg(times, amplitudes)
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        ) from error
+
+    filtered_points = [
+        {
+            "time" : time,
+            "ecg" : amplitude
+        }
+        for time, amplitude in zip(times, filtered_amplitudes)
+    ]
+
+    return {
+        "point_count" : len(filtered_points),
+        "filtered_points" : filtered_points
+    }
